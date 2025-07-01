@@ -1,6 +1,6 @@
 # Backend Server
 
-This directory contains the Python FastAPI backend server for NeuralBrain.
+This directory contains the Python FastAPI backend server for nerubrain.
 
 ## Files
 

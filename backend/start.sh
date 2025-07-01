@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Start NeuralBrain Backend Server
+# Start nerubrain Backend Server
 
-echo "🧠 Starting NeuralBrain Backend Server..."
+echo "Starting nerubrain Backend Server..."
 
 # Check if virtual environment exists
 if [ ! -d "neuralbrain_env" ]; then

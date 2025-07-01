@@ -16,7 +16,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="NeuralBrain AI Backend", version="1.0.0")
+app = FastAPI(title="nerubrain AI Backend", version="1.0.0")
 
 # CORS middleware to allow Chrome extension
 app.add_middleware(
@@ -220,7 +220,7 @@ async def answer_question(request: QuestionRequest):
 async def get_stats():
     """Get server statistics"""
     return {
-        "server": "NeuralBrain AI Backend",
+        "server": "nerubrain AI Backend",
         "version": "1.0.0",
         "uptime": "Running",
         "ai_providers": {
@@ -231,7 +231,7 @@ async def get_stats():
 
 if __name__ == "__main__":
     import uvicorn
-    print("🧠 Starting NeuralBrain AI Backend Server...")
+    print("Starting nerubrain AI Backend Server...")
     print("📡 Server will be available at: http://127.0.0.1:8000")
     print("🔍 Health check: http://127.0.0.1:8000/health")
     print("📊 Stats: http://127.0.0.1:8000/stats")

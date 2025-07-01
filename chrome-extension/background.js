@@ -7,7 +7,7 @@ let extensionStats = {
 
 // Handle extension installation
 chrome.runtime.onInstalled.addListener(() => {
-    console.log('NeuralBrain extension installed');
+    console.log('nerubrain extension installed');
     checkServerStatus();
 });
 

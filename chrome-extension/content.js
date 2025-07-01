@@ -5,6 +5,9 @@ class ComponentDetector {
         this.questions = new Set();
         this.observer = null;
         this.serverUrl = 'http://127.0.0.1:8000';
+        this.processedQuestions = new Map(); // Track processed questions with timestamps
+        this.questionCooldown = 10000; // 10 seconds cooldown between same questions
+        this.initialized = false;
         this.initializeDetection();
     }
 
@@ -12,7 +15,12 @@ class ComponentDetector {
         this.setupMutationObserver();
         this.scanExistingContent();
         this.setupMessageListener();
-        console.log('🧠 NeuralBrain: Component detection initialized');
+        
+        // Mark as initialized after a short delay to avoid processing initial content
+        setTimeout(() => {
+            this.initialized = true;
+            console.log('nerubrain: Component detection initialized');
+        }, 1000);
     }
 
     setupMutationObserver() {
@@ -67,8 +75,14 @@ class ComponentDetector {
                 timestamp: Date.now()
             });
             
-            // Automatically answer if enabled
-            this.handleQuestion(text, element);
+            // Check cooldown before automatically answering (only if active and initialized)
+            if (this.isActive && this.initialized && this.shouldProcessQuestion(text)) {
+                this.handleQuestion(text, element);
+            } else if (!this.isActive) {
+                console.log('nerubrain: Question detected but extension is inactive');
+            } else if (!this.initialized) {
+                console.log('nerubrain: Question detected but extension is not initialized yet');
+            }
         }
     }
 
@@ -123,15 +137,55 @@ class ComponentDetector {
     }
 
     isQuestion(text) {
-        if (!text || text.length < 5) return false;
+        if (!text || text.length < 10 || text.length > 300) return false;
         
-        const questionPatterns = [
-            /\?$/,
-            /^(what|how|why|when|where|who|which|can|could|would|should|do|does|did|is|are|was|were)/i,
-            /\b(question|ask|answer|solve|explain|help)\b/i
-        ];
-
-        return questionPatterns.some(pattern => pattern.test(text));
+        // Filter out code, scripts, and common non-question content
+        if (text.includes('function') || 
+            text.includes('var ') || 
+            text.includes('window.') ||
+            text.includes('document.') ||
+            text.includes('{') ||
+            text.includes('javascript') ||
+            text.includes('StackExchange') ||
+            text.includes('addEventListener') ||
+            text.includes('console.') ||
+            text.includes('return ') ||
+            text.includes('const ') ||
+            text.includes('let ') ||
+            text.includes('<div') ||
+            text.includes('</div>') ||
+            text.includes('class=') ||
+            text.includes('id=')) {
+            return false;
+        }
+        
+        // Filter out common UI text that ends with ?
+        if (text.match(/^(Search|Filter|Sort|View|Edit|Delete|Save|Cancel|Close|Open|Submit)\s*\?/i)) {
+            return false;
+        }
+        
+        // Must end with question mark OR start with clear question words
+        const endsWithQuestion = /\?$/;
+        const startsWithQuestion = /^(what|how|why|when|where|who|which|can|could|would|should|do|does|did|is|are|was|were)\s+/i;
+        
+        // Additional question indicators (but must be meaningful content)
+        const hasQuestionWords = /\b(question|ask|answer|solve|explain|help|problem)\b/i;
+        
+        // Must either end with ? OR start with question word + have reasonable length
+        if (endsWithQuestion.test(text)) {
+            return true;
+        }
+        
+        if (startsWithQuestion.test(text) && text.length > 20) {
+            return true;
+        }
+        
+        // For question indicator words, be more strict
+        if (hasQuestionWords.test(text) && text.length > 30 && /\?/.test(text)) {
+            return true;
+        }
+        
+        return false;
     }
 
     getElementContext(element) {
@@ -190,7 +244,7 @@ class ComponentDetector {
         answerBubble.className = 'neuralbrain-answer';
         answerBubble.innerHTML = `
             <div class="neuralbrain-answer-header">
-                🧠 NeuralBrain Answer
+                nerubrain Answer
                 <button class="neuralbrain-close">×</button>
             </div>
             <div class="neuralbrain-answer-content">${answer}</div>
@@ -260,11 +314,40 @@ class ComponentDetector {
         this.isActive = false;
         this.updateStats();
     }
+
+    shouldProcessQuestion(question) {
+        const now = Date.now();
+        const questionKey = question.toLowerCase().trim();
+        
+        // Check if we've processed this question recently
+        if (this.processedQuestions.has(questionKey)) {
+            const lastProcessed = this.processedQuestions.get(questionKey);
+            if (now - lastProcessed < this.questionCooldown) {
+                console.log('nerubrain: Question skipped (cooldown active):', questionKey.substring(0, 50) + '...');
+                return false;
+            }
+        }
+        
+        // Clean up old entries (older than 1 hour)
+        const oneHourAgo = now - (60 * 60 * 1000);
+        for (const [key, timestamp] of this.processedQuestions.entries()) {
+            if (timestamp < oneHourAgo) {
+                this.processedQuestions.delete(key);
+            }
+        }
+        
+        // Mark this question as processed
+        this.processedQuestions.set(questionKey, now);
+        console.log('nerubrain: Processing question:', questionKey.substring(0, 50) + '...');
+        return true;
+    }
 }
 
-// Initialize detector
+// Initialize detector but don't start automatically
 const detector = new ComponentDetector();
-detector.start();
+
+// Only start when extension is explicitly activated
+// The popup will send a toggle message to activate
 
 // Clean up on page unload
 window.addEventListener('beforeunload', () => {

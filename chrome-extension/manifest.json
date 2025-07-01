@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "NeuralBrain - AI Web Assistant",
+  "name": "nerubrain - AI Web Assistant",
   "version": "1.0.0",
   "description": "Real-time component detection and AI-powered question answering",
   "permissions": [
@@ -24,7 +24,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "NeuralBrain Assistant"
+    "default_title": "nerubrain Assistant"
   },
   "web_accessible_resources": [
     {

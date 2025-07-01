@@ -1,6 +1,6 @@
 # Chrome Extension Development
 
-This directory contains all Chrome extension files for NeuralBrain.
+This directory contains all Chrome extension files for nerubrain.
 
 ## Files
 
@@ -16,14 +16,14 @@ This directory contains all Chrome extension files for NeuralBrain.
 1. Open Chrome and go to `chrome://extensions/`
 2. Enable "Developer mode" (toggle in top-right)
 3. Click "Load unpacked" and select this directory
-4. The 🧠 NeuralBrain icon will appear in your toolbar
+4. The nerubrain icon will appear in your toolbar
 
 ## Development
 
 To modify the extension:
 1. Make changes to the files
 2. Go to `chrome://extensions/`
-3. Click the refresh icon on the NeuralBrain extension
+3. Click the refresh icon on the nerubrain extension
 4. Test your changes
 
 ## Permissions

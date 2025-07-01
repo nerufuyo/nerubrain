@@ -1,6 +1,6 @@
 # Demo Files
 
-This directory contains demonstration and testing files for NeuralBrain.
+This directory contains demonstration and testing files for nerubrain.
 
 ## Files
 
@@ -10,7 +10,7 @@ This directory contains demonstration and testing files for NeuralBrain.
 
 ### Test Page
 
-Open `test-page.html` in Chrome with the NeuralBrain extension installed to see:
+Open `test-page.html` in Chrome with the nerubrain extension installed to see:
 
 - Real-time component detection
 - Automatic question identification

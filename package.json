@@ -1,8 +1,8 @@
 {
-  "name": "NeuralBrain",
+  "name": "nerubrain",
   "version": "1.0.0",
   "description": "AI-powered Chrome extension for real-time component detection and question answering",
-  "author": "NeuralBrain Team",
+  "author": "nerubrain Team",
   "license": "MIT",
   "repository": {
     "type": "git",
