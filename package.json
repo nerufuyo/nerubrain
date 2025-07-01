@@ -1,0 +1,35 @@
+{
+  "name": "NeuralBrain",
+  "version": "1.0.0",
+  "description": "AI-powered Chrome extension for real-time component detection and question answering",
+  "author": "NeuralBrain Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/neuralbrain"
+  },
+  "keywords": [
+    "chrome-extension",
+    "ai",
+    "machine-learning",
+    "web-components",
+    "question-answering",
+    "claude",
+    "openai",
+    "fastapi",
+    "python"
+  ],
+  "engines": {
+    "python": ">=3.8",
+    "node": ">=14"
+  },
+  "dependencies": {
+    "python": {
+      "fastapi": ">=0.110.0",
+      "uvicorn": ">=0.27.0",
+      "aiohttp": ">=3.9.3",
+      "pydantic": ">=2.6.0",
+      "python-dotenv": ">=1.0.0"
+    }
+  }
+}

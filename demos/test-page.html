@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralBrain Test Page - AI Questions Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .question-section {
+            background: #f8f9ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .question {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .context {
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .button-demo {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .demo-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s ease;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .form-demo {
+            background: #fff;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .form-demo input, .form-demo textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        .modal-trigger {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .navigation-demo {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .navigation-demo a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background 0.2s ease;
+        }
+        
+        .navigation-demo a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .card-demo {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .instructions {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 NeuralBrain Test Page</h1>
+            <p>This page contains various components and questions to test the AI extension</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <p>1. Make sure the NeuralBrain extension is installed and the Python backend is running</p>
+            <p>2. Open the extension popup to see component detection in real-time</p>
+            <p>3. The extension will automatically detect questions and provide AI answers</p>
+            <p>4. Look for floating answer bubbles next to detected questions</p>
+        </div>
+        
+        <div class="question-section">
+            <div class="question">What is artificial intelligence?</div>
+            <div class="context">This is a basic AI question that should be detected and answered automatically.</div>
+        </div>
+        
+        <div class="question-section">
+            <div class="question">How does machine learning work?</div>
+            <div class="context">A more technical question about ML algorithms and processes.</div>
+        </div>
+        
+        <div class="question-section">
+            <div class="question">Can you explain neural networks?</div>
+            <div class="context">A question about deep learning and neural network architecture.</div>
+        </div>
+        
+        <div class="button-demo">
+            <h3>Button Components</h3>
+            <button class="demo-button">Primary Action</button>
+            <button class="demo-button">Secondary Action</button>
+            <button class="modal-trigger">Open Modal</button>
+        </div>
+        
+        <div class="form-demo">
+            <h3>Form Components</h3>
+            <p><strong>What information do you need to create an account?</strong></p>
+            <input type="text" placeholder="Your name">
+            <input type="email" placeholder="Email address">
+            <textarea placeholder="Tell us about yourself"></textarea>
+            <button class="demo-button">Submit Form</button>
+        </div>
+        
+        <div class="navigation-demo">
+            <h3 style="color: white; margin-top: 0;">Navigation Component</h3>
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#services">Services</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+        
+        <div class="card-demo">
+            <h3>Card Component with Question</h3>
+            <p><strong>Why should you choose our service?</strong></p>
+            <p>Our service offers the best value for money with cutting-edge technology and 24/7 support.</p>
+        </div>
+        
+        <div class="card-demo">
+            <h3>Another Card</h3>
+            <p><strong>How can we help you today?</strong></p>
+            <p>We provide comprehensive solutions for all your business needs.</p>
+        </div>
+        
+        <div class="question-section">
+            <div class="question">What are the benefits of using Chrome extensions?</div>
+            <div class="context">This question relates to browser extensions and web development.</div>
+        </div>
+        
+        <div class="question-section">
+            <div class="question">How do I get started with web development?</div>
+            <div class="context">A beginner question about learning web development skills.</div>
+        </div>
+        
+        <div style="margin-top: 50px; text-align: center; color: #666;">
+            <p>🧠 This page demonstrates NeuralBrain's component detection and AI question answering capabilities</p>
+            <p>Check the extension popup to see detected components and questions in real-time!</p>
+        </div>
+    </div>
+    
+    <script>
+        // Add some dynamic content to test real-time detection
+        setTimeout(() => {
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-section';
+            newQuestion.innerHTML = `
+                <div class="question">What is the future of artificial intelligence?</div>
+                <div class="context">This question was added dynamically to test real-time detection.</div>
+            `;
+            document.querySelector('.container').appendChild(newQuestion);
+        }, 3000);
+        
+        // Add click handlers for demo buttons
+        document.querySelectorAll('.demo-button').forEach(button => {
+            button.addEventListener('click', () => {
+                alert('Button clicked! The extension detected this component.');
+            });
+        });
+        
+        document.querySelector('.modal-trigger').addEventListener('click', () => {
+            alert('Modal would open here! This is a modal trigger component.');
+        });
+    </script>
+</body>
+</html>

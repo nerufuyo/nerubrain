@@ -1,0 +1,90 @@
+/* NeuralBrain Answer Bubble Styles */
+.neuralbrain-answer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    min-width: 300px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.neuralbrain-answer-header {
+    padding: 15px 20px 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+}
+
+.neuralbrain-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.neuralbrain-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.neuralbrain-answer-content {
+    padding: 15px 20px;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.neuralbrain-answer-content p {
+    margin: 0 0 10px 0;
+}
+
+.neuralbrain-answer-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Component highlighting for development */
+.neuralbrain-highlight {
+    outline: 2px dashed #667eea !important;
+    outline-offset: 2px;
+    position: relative;
+}
+
+.neuralbrain-highlight::before {
+    content: attr(data-component-type);
+    position: absolute;
+    top: -25px;
+    left: 0;
+    background: #667eea;
+    color: white;
+    padding: 2px 6px;
+    font-size: 11px;
+    border-radius: 3px;
+    font-family: monospace;
+    z-index: 1000;
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 350px;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .indicator.active {
+            background: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        
+        .indicator.inactive {
+            background: #F44336;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .settings {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .settings label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .settings select {
+            width: 100%;
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 12px;
+        }
+        
+        .settings select option {
+            background: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🧠 NeuralBrain</div>
+        <div class="subtitle">AI Web Assistant</div>
+    </div>
+    
+    <div class="status">
+        <div class="status-item">
+            <span>Backend Server:</span>
+            <span><span class="indicator" id="serverStatus"></span> <span id="serverText">Checking...</span></span>
+        </div>
+        <div class="status-item">
+            <span>Detection Active:</span>
+            <span><span class="indicator" id="detectionStatus"></span> <span id="detectionText">Initializing...</span></span>
+        </div>
+        <div class="status-item">
+            <span>Components Found:</span>
+            <span id="componentCount">0</span>
+        </div>
+        <div class="status-item">
+            <span>Questions Detected:</span>
+            <span id="questionCount">0</span>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="toggleDetection">Toggle Detection</button>
+        <button id="analyzeNow">Analyze Now</button>
+    </div>
+    
+    <div class="settings">
+        <label for="aiProvider">AI Provider:</label>
+        <select id="aiProvider">
+            <option value="claude">Claude (Sonnet)</option>
+            <option value="gpt">OpenAI GPT</option>
+        </select>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
