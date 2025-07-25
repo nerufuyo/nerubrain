@@ -6,10 +6,12 @@ A comprehensive browser extension that intelligently automates Coursera learning
 
 - [Features](#features)
 - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Development Setup](#development-setup)
 - [Usage](#usage)
 - [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -54,24 +56,49 @@ backend/
 └── tests/            # Backend tests
 ```
 
+## Quick Start
+
+### 1. Load Extension (2 minutes)
+1. Open Chrome browser
+2. Go to: `chrome://extensions/`
+3. Turn ON "Developer mode" (toggle top-right)
+4. Click "Load unpacked"
+5. Select folder: `/path/to/nerubrain/dist`
+6. Extension loads with blue circular icon
+
+### 2. Test Basic Functionality (1 minute)
+1. Click extension icon on ANY website
+2. Popup should open immediately
+3. Shows page information and controls
+
+### 3. Test on Coursera (2 minutes)
+1. Go to: https://www.coursera.org/learn/machine-learning
+2. Click extension icon
+3. Should show "Coursera Page" and "Automatable: Yes"
+4. "Start Automation" button should be ENABLED
+
 ## Installation
 
-### From Chrome Web Store
-1. Visit the Chrome Web Store (link coming soon)
-2. Click "Add to Chrome"
-3. Navigate to any Coursera course to start automating
-
-### Manual Installation (Development)
-1. Clone the repository
-2. Build the extension
-3. Load unpacked extension in Chrome
-
-## Development Setup
-
 ### Prerequisites
+- Chrome browser
 - Node.js 18+ and npm
 - Python 3.8+
-- Chrome browser for testing
+
+### Backend Setup
+```bash
+# Navigate to project directory
+cd nerubrain
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the API server
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+```
 
 ### Frontend Setup
 ```bash
@@ -81,30 +108,8 @@ npm install
 # Start development build with watch mode
 npm run dev
 
-# Run tests
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-
 # Build for production
 npm run build
-```
-
-### Backend Setup
-```bash
-# Navigate to backend directory
-cd backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the API server
-python main.py
 ```
 
 ### Loading Extension in Chrome
@@ -113,7 +118,7 @@ python main.py
 3. Click "Load unpacked" and select the `dist` folder
 4. The extension should now appear in your extensions list
 
-## 📖 Usage
+## Usage
 
 ### Basic Usage
 1. **Navigate to Coursera** - Go to any Coursera course
@@ -129,20 +134,43 @@ python main.py
 - **Feature Toggles**: Enable/disable specific automation features
 - **Safety Settings**: Configure retry limits and timeouts
 
-#### Analytics Dashboard
-- Track completed modules and quiz scores
-- Monitor time savings and learning efficiency
-- View progress across multiple courses
-- Export data for further analysis
-
-### Page Types Supported
+#### Page Types Supported
 - ✅ **Quiz Pages** - Multiple choice, true/false, text input
-- ✅ **Video Lectures** - Automated playback and completion
+- ✅ **Video Lectures** - Automated playbook and completion
 - ✅ **Reading Materials** - Progress tracking and completion
 - ✅ **Discussion Forums** - Structured participation
 - ✅ **Assignments** - Basic automation support
 
-## 🧪 Testing
+### Real-World Testing
+
+#### Test with Free Course
+1. Go to: https://www.coursera.org/learn/machine-learning
+2. Click "Enroll for Free" (no payment required)
+3. Navigate to first video lesson
+4. Click extension icon → Start Automation
+5. Video should auto-play and speed up
+
+#### Test Different Content Types
+
+**Video Lecture Testing:**
+1. Find a video lecture in the course
+2. Click extension icon
+3. Start automation
+4. Expected: Video should auto-play and speed up
+
+**Quiz Testing:**
+1. Find a quiz or practice exercise
+2. Click extension icon
+3. Start automation
+4. Expected: Quiz questions should be automatically answered
+
+**Reading Material Testing:**
+1. Find reading material/articles
+2. Click extension icon
+3. Start automation
+4. Expected: Reading should be marked as completed
+
+## Testing
 
 ### Running Tests
 ```bash
@@ -165,53 +193,125 @@ npm test -- dom.test.ts
 - **Function Coverage**: 90%+
 - **Statement Coverage**: 100%
 
-### Test Structure
+### Manual Testing Checklist
+
+#### Basic Functionality
+- [ ] Extension loads without errors
+- [ ] Popup opens on any website
+- [ ] Correctly detects Coursera vs non-Coursera pages
+- [ ] Feature toggles work
+- [ ] Can start automation on Coursera
+- [ ] Backend server running and accessible
+
+#### Expected Results
+
+**On Any Website (e.g., google.com):**
+- Page Type: "Other Website"
+- Automatable: "No"
+- Start button: DISABLED
+
+**On Coursera.org:**
+- Page Type: "Coursera Page"
+- Automatable: "Yes"
+- Start button: ENABLED
+
+**When Starting Automation:**
+- Status: Changes to "Automation Active" (blue pulsing dot)
+- Log: Shows "Automation started successfully"
+- Buttons: Start disabled, Stop enabled
+
+## Troubleshooting
+
+### Extension Issues
+
+#### Popup Won't Open
+1. Go to `chrome://extensions/`
+2. Check for any red error text under the extension
+3. Click refresh icon (🔄) on extension
+4. Try clicking the icon again
+
+#### Extension Shows Errors
+1. Check that all files exist in `dist/` folder
+2. Reload extension
+3. Check browser console for errors
+
+#### Content Script Not Working
+1. Go to a Coursera page
+2. Open Developer Tools (F12)
+3. Check Console for "[Coursera Automation]" messages
+4. Look for any error messages
+
+### Backend Issues
+
+#### Backend Not Responding
+```bash
+# Restart backend
+pkill -f uvicorn
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
-tests/
-├── utils/           # Utility function tests
-├── core/            # Core automation tests
-├── integration/     # Integration tests
-└── e2e/             # End-to-end tests
+
+#### Test Backend Endpoints
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/api/courses
 ```
 
-## 🏆 Implementation Phases
+### Common Solutions
 
-### Phase 1: Foundation (Weeks 1-2) ✅
-- [x] Project structure and build system
-- [x] Extension manifest and basic components
-- [x] TypeScript configuration
-- [x] Testing framework setup
-- [x] Build pipeline working
-- [x] Basic tests passing
+**Extension not loading:**
+```bash
+# Rebuild extension
+npm run clean && npm run build
 
-### Phase 2: Content Detection (Weeks 3-4) ✅
-- [x] Page type detection
-- [x] Content parsing utilities
-- [x] Navigation automation
-- [x] Progress tracking
-- [x] Chrome Extension architecture
+# Reload in Chrome
+# Go to chrome://extensions/ → click refresh icon
+```
 
-### Phase 3: Core Automation (Weeks 5-8) 🚧
-- [x] Quiz automation system
-- [x] Video automation system
-- [x] DOM utilities and helpers
-- [x] Extension communication
-- [ ] Reading material automation
-- [ ] Discussion automation
+**Content security policy errors:**
+- Ensure CSP has been removed from manifest.json
+- Check popup console for blocked resource errors
 
-### Phase 4: Advanced Features (Weeks 9-10) 📅
-- [ ] Analytics dashboard
-- [ ] Link sharing functionality
-- [ ] Performance optimization
-- [ ] Advanced settings
+**Permission issues:**
+- Verify host permissions granted for coursera.org
+- Check if extension has required permissions
 
-### Phase 5: Quality Assurance (Weeks 11-12) 📅
-- [ ] Comprehensive testing
-- [ ] Security audit
-- [ ] Performance optimization
-- [ ] Documentation completion
+## Development Workflow
 
-## 🔒 Security & Privacy
+### Project Structure
+```
+nerubrain/
+├── dist/                 # Built extension files
+├── src/                  # Source TypeScript files
+├── backend/              # Python FastAPI backend
+├── tests/                # Test files
+├── package.json          # Node.js dependencies
+├── tsconfig.json         # TypeScript configuration
+├── webpack.config.js     # Build configuration
+└── README.md            # This file
+```
+
+### Quick Commands
+```bash
+# Terminal 1: Start backend
+uvicorn backend.main:app --reload --port 8000
+
+# Terminal 2: Build extension
+npm run build
+
+# Terminal 3: Run tests
+npm test
+```
+
+### File Monitoring
+```bash
+# Monitor backend logs
+tail -f backend/logs/app.log
+
+# Watch webpack rebuild
+npm run dev
+```
+
+## Security & Privacy
 
 ### Privacy Protection
 - **Local Processing** - Most operations happen locally
@@ -226,16 +326,22 @@ tests/
 - **Educational Purpose** - Designed to enhance learning
 
 ### Technical Security
-- **Content Security Policy** - Strict CSP implementation
 - **Input Validation** - All inputs are validated and sanitized
 - **Secure Communication** - HTTPS for all API calls
 - **Regular Updates** - Timely security patches
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please follow these guidelines:
 
-### Development Workflow
+### Development Standards
+- **TypeScript** - Use strict type checking
+- **ESLint** - Follow configured linting rules
+- **Prettier** - Code formatting is enforced
+- **Jest** - Write comprehensive tests
+- **Clean Code** - Follow SOLID principles
+
+### Workflow
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Make your changes with tests
@@ -244,28 +350,14 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 6. Push to the branch: `git push origin feature/amazing-feature`
 7. Open a Pull Request
 
-### Code Standards
-- **TypeScript** - Use strict type checking
-- **ESLint** - Follow configured linting rules
-- **Prettier** - Code formatting is enforced
-- **Jest** - Write comprehensive tests
-- **Clean Code** - Follow SOLID principles
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🎉 Acknowledgments
-
-- Coursera for providing an excellent learning platform
-- The open-source community for amazing tools and libraries
-- All contributors who help improve this extension
-
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/nerufuyo/nerubrain/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/nerufuyo/nerubrain/discussions)
-- **Email**: support@nerubrain.dev
 
 ---
 
