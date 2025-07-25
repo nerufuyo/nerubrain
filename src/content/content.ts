@@ -61,6 +61,7 @@ class ContentScript {
 
   private async handleMessage(message: ExtensionMessage, sendResponse: (response: any) => void): Promise<void> {
     try {
+      this.logger.info('Content script received message:', message);
       const { type, payload } = message;
       
       switch (type) {
@@ -105,9 +106,29 @@ class ContentScript {
 
     try {
       const pageType = this.pageDetector.detectPageType();
+      this.logger.info(`Detected page type: ${pageType}`);
       
       if (!this.pageDetector.isAutomatable()) {
-        throw new Error(`Page type ${pageType} is not automatable`);
+        // Instead of throwing an error, try to detect what type of content is available
+        const url = window.location.href;
+        this.logger.warn(`Page type ${pageType} is not directly automatable, but checking for automation opportunities...`);
+        
+        // Try to find quiz elements even if page type is unknown
+        if (url.includes('quiz') || url.includes('assignment') || url.includes('exam')) {
+          this.logger.info('Found quiz-related URL, attempting quiz automation...');
+          await this.executeAutomation(PageType.QUIZ_PAGE, config);
+          return;
+        }
+        
+        // Try to find video elements
+        const videoElement = document.querySelector('video');
+        if (videoElement) {
+          this.logger.info('Found video element, attempting video automation...');
+          await this.executeAutomation(PageType.VIDEO_LECTURE, config);
+          return;
+        }
+        
+        throw new Error(`Page type ${pageType} is not automatable. URL: ${url}`);
       }
 
       await this.executeAutomation(pageType, config);

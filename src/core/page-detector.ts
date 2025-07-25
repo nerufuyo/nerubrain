@@ -9,7 +9,7 @@ export class CourseraPageDetector implements IPageDetector {
     [PageType.COURSE_HOME]: /\/learn\/[^/]+\/?$/,
     [PageType.MODULE_PAGE]: /\/learn\/[^/]+\/[^/]+\/?$/,
     [PageType.VIDEO_LECTURE]: /\/learn\/[^/]+\/lecture\/[^/]+/,
-    [PageType.QUIZ_PAGE]: /\/learn\/[^/]+\/quiz\/[^/]+/,
+    [PageType.QUIZ_PAGE]: /\/learn\/[^/]+\/(quiz|assignment-submission|exam)\/[^/]+/,
     [PageType.READING_PAGE]: /\/learn\/[^/]+\/supplement\/[^/]+/,
     [PageType.DISCUSSION_PAGE]: /\/learn\/[^/]+\/discussions/
   };

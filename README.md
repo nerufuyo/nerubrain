@@ -86,8 +86,8 @@ backend/
 
 ### Backend Setup
 ```bash
-# Navigate to project directory
-cd nerubrain
+# Navigate to backend directory
+cd nerubrain/backend
 
 # Create virtual environment
 python -m venv venv
@@ -96,8 +96,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Start the API server
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+# Start the API server (from backend directory)
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Frontend Setup
@@ -247,7 +247,9 @@ npm test -- dom.test.ts
 ```bash
 # Restart backend
 pkill -f uvicorn
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+cd nerubrain/backend
+source venv/bin/activate
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 #### Test Backend Endpoints
@@ -293,12 +295,16 @@ nerubrain/
 ### Quick Commands
 ```bash
 # Terminal 1: Start backend
-uvicorn backend.main:app --reload --port 8000
+cd nerubrain/backend
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+uvicorn main:app --reload --port 8000
 
 # Terminal 2: Build extension
+cd nerubrain
 npm run build
 
 # Terminal 3: Run tests
+cd nerubrain
 npm test
 ```
 

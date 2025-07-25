@@ -92,12 +92,16 @@ class BackgroundService {
       
       switch (type) {
         case MessageType.START_AUTOMATION:
-          await this.handleStartAutomation(payload, sender.tab?.id);
+          // If no tab ID from sender (e.g., popup), get the current active tab
+          const startTabId = sender.tab?.id || await this.getCurrentActiveTab();
+          await this.handleStartAutomation(payload, startTabId);
           sendResponse({ success: true });
           break;
 
         case MessageType.STOP_AUTOMATION:
-          await this.handleStopAutomation(sender.tab?.id);
+          // If no tab ID from sender (e.g., popup), get the current active tab
+          const stopTabId = sender.tab?.id || await this.getCurrentActiveTab();
+          await this.handleStopAutomation(stopTabId);
           sendResponse({ success: true });
           break;
 
@@ -195,15 +199,17 @@ class BackgroundService {
   }
 
   private async handleError(error: any, tabId?: number): Promise<void> {
-    this.logger.error('Automation error reported:', error);
+    // Extract error message properly to avoid logging [object Object]
+    const errorMessage = error?.message || error?.error || (typeof error === 'string' ? error : JSON.stringify(error));
+    this.logger.error('Automation error reported:', errorMessage);
     
     // Store error for analytics
     const errorLog = {
       timestamp: new Date(),
       tabId,
-      error: error.message || String(error),
-      stack: error.stack,
-      url: error.url
+      error: errorMessage,
+      stack: error?.stack,
+      url: error?.url
     };
 
     const errors = await this.storage.get<any[]>('error_log') || [];
@@ -219,7 +225,7 @@ class BackgroundService {
     // Show notification if enabled
     const settings = await this.storage.get<AutomationSettings>('automation_settings');
     if (settings?.notifications.showErrors) {
-      await this.showErrorNotification(error.message);
+      await this.showErrorNotification(errorMessage);
     }
   }
 
@@ -240,7 +246,7 @@ class BackgroundService {
   private async showWelcomeNotification(): Promise<void> {
     await chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icons/icon48.png',
+      iconUrl: 'icons/icon48.svg',
       title: 'Coursera Automation Extension',
       message: 'Extension installed successfully! Navigate to Coursera to start automating your learning.'
     });
@@ -249,7 +255,7 @@ class BackgroundService {
   private async showErrorNotification(errorMessage: string): Promise<void> {
     await chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icons/icon48.png',
+      iconUrl: 'icons/icon48.svg',
       title: 'Automation Error',
       message: `An error occurred: ${errorMessage.substring(0, 100)}...`
     });
@@ -257,6 +263,14 @@ class BackgroundService {
 
   private generateId(): string {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private async getCurrentActiveTab(): Promise<number> {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tabs[0]?.id) {
+      throw new Error('No active tab found');
+    }
+    return tabs[0].id;
   }
 }
 

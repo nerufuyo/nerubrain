@@ -1,5 +1,7 @@
 // Production popup controller for Coursera automation extension
 
+import { ExtensionMessage, MessageType } from '../types/index';
+
 class PopupController {
     private currentTab: chrome.tabs.Tab | null = null;
     private isAutomationActive = false;
@@ -79,14 +81,20 @@ class PopupController {
             this.updateStatus('active', 'Starting automation...');
             this.updateButtons();
             
-            const response = await chrome.tabs.sendMessage(this.currentTab.id!, {
-                type: 'START_AUTOMATION',
+            this.log('Sending START_AUTOMATION message to background script...');
+            
+            const message: ExtensionMessage = {
+                type: MessageType.START_AUTOMATION,
                 payload: {
                     settings: this.settings,
                     autoNavigate: true
                 },
-                timestamp: new Date().toISOString()
-            });
+                timestamp: new Date(),
+                id: this.generateMessageId()
+            };
+
+            // Send message to background script, which will forward to content script
+            const response = await chrome.runtime.sendMessage(message);
 
             if (response && response.success) {
                 this.updateStatus('active', 'Automation Active');
@@ -110,10 +118,12 @@ class PopupController {
             this.updateStatus('ready', 'Stopping...');
             this.updateButtons();
 
-            await chrome.tabs.sendMessage(this.currentTab.id!, {
-                type: 'STOP_AUTOMATION',
+            // Send message to background script, which will forward to content script
+            await chrome.runtime.sendMessage({
+                type: MessageType.STOP_AUTOMATION,
                 payload: {},
-                timestamp: new Date().toISOString()
+                timestamp: new Date(),
+                id: this.generateMessageId()
             });
 
             this.updateStatus('ready', 'Ready');
@@ -190,6 +200,10 @@ class PopupController {
             
             logContainer.scrollTop = logContainer.scrollHeight;
         }
+    }
+
+    private generateMessageId(): string {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     }
 }
 
