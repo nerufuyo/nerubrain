@@ -1,392 +1,201 @@
-// Popup script for Coursera automation extension
-
-import { 
-  MessageType, 
-  AutomationSettings
-} from '../types/index';
-import { ChromeStorage } from '../utils/storage';
-import { Logger } from '../utils/logger';
+// Production popup controller for Coursera automation extension
 
 class PopupController {
-  private readonly logger = Logger.getInstance();
-  private readonly storage = ChromeStorage.getInstance();
-  
-  private currentTab: chrome.tabs.Tab | null = null;
-  private settings: AutomationSettings | null = null;
-  private isAutomationActive = false;
-
-  constructor() {
-    this.initialize();
-  }
-
-  private async initialize(): Promise<void> {
-    await this.getCurrentTab();
-    await this.loadSettings();
-    this.setupEventListeners();
-    await this.updateUI();
-    await this.detectCurrentPage();
-  }
-
-  private async getCurrentTab(): Promise<void> {
-    try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      this.currentTab = tabs[0] || null;
-    } catch (error) {
-      this.logger.error('Failed to get current tab:', error);
-    }
-  }
-
-  private async loadSettings(): Promise<void> {
-    this.settings = await this.storage.get<AutomationSettings>('automation_settings');
-    if (this.settings) {
-      this.populateSettingsUI();
-    }
-  }
-
-  private setupEventListeners(): void {
-    // Action buttons
-    document.getElementById('startAutomation')?.addEventListener('click', () => this.startAutomation());
-    document.getElementById('stopAutomation')?.addEventListener('click', () => this.stopAutomation());
+    private currentTab: chrome.tabs.Tab | null = null;
+    private isAutomationActive = false;
+    private settings = {
+        quiz: true,
+        video: true,
+        reading: true
+    };
     
-    // Settings toggles
-    document.getElementById('quizAutomation')?.addEventListener('change', () => this.updateSettings());
-    document.getElementById('videoAutomation')?.addEventListener('change', () => this.updateSettings());
-    document.getElementById('readingAutomation')?.addEventListener('change', () => this.updateSettings());
-    document.getElementById('linkSharing')?.addEventListener('change', () => this.updateSettings());
-    
-    // Speed controls
-    document.getElementById('videoSpeed')?.addEventListener('change', () => this.updateSettings());
-    document.getElementById('quizDelay')?.addEventListener('change', () => this.updateSettings());
-    
-    // Footer buttons
-    document.getElementById('openOptions')?.addEventListener('click', () => this.openOptionsPage());
-    document.getElementById('shareLink')?.addEventListener('click', () => this.shareCurrentPage());
-    document.getElementById('viewAnalytics')?.addEventListener('click', () => this.viewAnalytics());
-  }
-
-  private async startAutomation(): Promise<void> {
-    if (!this.currentTab?.id || !this.isCoursera()) {
-      this.showError('Please navigate to a Coursera page first');
-      return;
+    constructor() {
+        this.init();
     }
 
-    try {
-      this.setLoadingState(true);
-      this.isAutomationActive = true;
-      
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: MessageType.START_AUTOMATION,
-        payload: {
-          autoNavigate: true,
-          settings: this.settings
-        },
-        timestamp: new Date(),
-        id: this.generateId()
-      });
-
-      if (response?.success) {
-        this.updateStatusIndicator('active', 'Automation Active');
-        this.updateActionButtons();
-        this.showSuccess('Automation started successfully');
-      } else {
-        throw new Error(response?.error || 'Unknown error');
-      }
-    } catch (error) {
-      this.showError(`Failed to start automation: ${error}`);
-      this.isAutomationActive = false;
-    } finally {
-      this.setLoadingState(false);
-    }
-  }
-
-  private async stopAutomation(): Promise<void> {
-    if (!this.currentTab?.id) return;
-
-    try {
-      this.setLoadingState(true);
-      
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: MessageType.STOP_AUTOMATION,
-        payload: {},
-        timestamp: new Date(),
-        id: this.generateId()
-      });
-
-      if (response?.success) {
-        this.isAutomationActive = false;
-        this.updateStatusIndicator('ready', 'Ready');
-        this.updateActionButtons();
-        this.showSuccess('Automation stopped');
-      }
-    } catch (error) {
-      this.showError(`Failed to stop automation: ${error}`);
-    } finally {
-      this.setLoadingState(false);
-    }
-  }
-
-  private async updateSettings(): Promise<void> {
-    if (!this.settings) return;
-
-    // Update feature flags
-    const quizEnabled = (document.getElementById('quizAutomation') as HTMLInputElement)?.checked;
-    const videoEnabled = (document.getElementById('videoAutomation') as HTMLInputElement)?.checked;
-    const readingEnabled = (document.getElementById('readingAutomation') as HTMLInputElement)?.checked;
-    const linkSharingEnabled = (document.getElementById('linkSharing') as HTMLInputElement)?.checked;
-
-    this.settings.enabledFeatures.forEach(feature => {
-      switch (feature.feature) {
-        case 'quiz_automation' as any:
-          feature.enabled = quizEnabled;
-          break;
-        case 'video_automation' as any:
-          feature.enabled = videoEnabled;
-          break;
-        case 'reading_automation' as any:
-          feature.enabled = readingEnabled;
-          break;
-        case 'link_sharing' as any:
-          feature.enabled = linkSharingEnabled;
-          break;
-      }
-      feature.lastModified = new Date();
-    });
-
-    // Update speed settings
-    const videoSpeed = parseFloat((document.getElementById('videoSpeed') as HTMLSelectElement)?.value || '1.5');
-    const quizDelay = parseInt((document.getElementById('quizDelay') as HTMLInputElement)?.value || '1000');
-
-    this.settings.speedPreferences.videoSpeed = videoSpeed;
-    this.settings.speedPreferences.quizDelay = quizDelay;
-
-    // Save settings
-    await this.storage.set('automation_settings', this.settings);
-    
-    // Notify background script
-    try {
-      await chrome.runtime.sendMessage({
-        type: MessageType.UPDATE_SETTINGS,
-        payload: this.settings,
-        timestamp: new Date(),
-        id: this.generateId()
-      });
-    } catch (error) {
-      this.logger.debug('Could not notify background of settings change:', error);
-    }
-  }
-
-  private populateSettingsUI(): void {
-    if (!this.settings) return;
-
-    // Populate feature toggles
-    this.settings.enabledFeatures.forEach(feature => {
-      let elementId = '';
-      switch (feature.feature) {
-        case 'quiz_automation' as any:
-          elementId = 'quizAutomation';
-          break;
-        case 'video_automation' as any:
-          elementId = 'videoAutomation';
-          break;
-        case 'reading_automation' as any:
-          elementId = 'readingAutomation';
-          break;
-        case 'link_sharing' as any:
-          elementId = 'linkSharing';
-          break;
-      }
-      
-      const element = document.getElementById(elementId) as HTMLInputElement;
-      if (element) {
-        element.checked = feature.enabled;
-      }
-    });
-
-    // Populate speed settings
-    const videoSpeedSelect = document.getElementById('videoSpeed') as HTMLSelectElement;
-    if (videoSpeedSelect) {
-      videoSpeedSelect.value = this.settings.speedPreferences.videoSpeed.toString();
+    private async init(): Promise<void> {
+        try {
+            await this.getCurrentTab();
+            this.setupEventListeners();
+            this.updateUI();
+            this.log('Extension initialized');
+        } catch (error) {
+            this.log('Initialization error: ' + (error as Error).message);
+        }
     }
 
-    const quizDelayInput = document.getElementById('quizDelay') as HTMLInputElement;
-    if (quizDelayInput) {
-      quizDelayInput.value = this.settings.speedPreferences.quizDelay.toString();
-    }
-  }
-
-  private async detectCurrentPage(): Promise<void> {
-    if (!this.currentTab?.id || !this.isCoursera()) {
-      this.updatePageInfo('unknown', false);
-      return;
+    private async getCurrentTab(): Promise<void> {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        this.currentTab = tabs[0] || null;
     }
 
-    try {
-      // Request page detection from content script
-      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: MessageType.PAGE_DETECTED,
-        payload: {},
-        timestamp: new Date(),
-        id: this.generateId()
-      });
+    private setupEventListeners(): void {
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', () => this.startAutomation());
+        }
+        
+        if (stopBtn) {
+            stopBtn.addEventListener('click', () => this.stopAutomation());
+        }
 
-      if (response?.success && response.data) {
-        this.updatePageInfo(response.data.pageType, response.data.isAutomatable);
-      }
-    } catch (error) {
-      this.logger.debug('Could not detect page type:', error);
-      this.updatePageInfo('unknown', false);
-    }
-  }
-
-  private updatePageInfo(pageType: string, isAutomatable: boolean): void {
-    const pageTypeElement = document.getElementById('pageType');
-    const automatableBadge = document.getElementById('automatableBadge');
-
-    if (pageTypeElement) {
-      pageTypeElement.textContent = this.formatPageType(pageType);
+        // Feature toggles
+        const toggles = document.querySelectorAll('.toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => this.toggleFeature(toggle as HTMLElement));
+        });
     }
 
-    if (automatableBadge) {
-      automatableBadge.textContent = isAutomatable ? 'Automatable' : 'Not Automatable';
-      automatableBadge.className = `automatable-badge ${isAutomatable ? 'yes' : 'no'}`;
+    private toggleFeature(toggleElement: HTMLElement): void {
+        const feature = toggleElement.dataset['feature'] as keyof typeof this.settings;
+        const isActive = toggleElement.classList.contains('active');
+        
+        if (isActive) {
+            toggleElement.classList.remove('active');
+            this.settings[feature] = false;
+        } else {
+            toggleElement.classList.add('active');
+            this.settings[feature] = true;
+        }
+        
+        this.log(feature + ' automation ' + (this.settings[feature] ? 'enabled' : 'disabled'));
     }
 
-    // Update action button availability
-    const startButton = document.getElementById('startAutomation') as HTMLButtonElement;
-    if (startButton) {
-      startButton.disabled = !isAutomatable || this.isAutomationActive;
+    private async startAutomation(): Promise<void> {
+        if (!this.currentTab) {
+            this.log('No active tab found');
+            return;
+        }
+
+        if (!this.isCoursera()) {
+            this.log('Please navigate to a Coursera page first');
+            return;
+        }
+
+        try {
+            this.isAutomationActive = true;
+            this.updateStatus('active', 'Starting automation...');
+            this.updateButtons();
+            
+            const response = await chrome.tabs.sendMessage(this.currentTab.id!, {
+                type: 'START_AUTOMATION',
+                payload: {
+                    settings: this.settings,
+                    autoNavigate: true
+                },
+                timestamp: new Date().toISOString()
+            });
+
+            if (response && response.success) {
+                this.updateStatus('active', 'Automation Active');
+                this.log('Automation started successfully');
+            } else {
+                throw new Error(response?.error || 'Failed to start automation');
+            }
+        } catch (error) {
+            this.isAutomationActive = false;
+            this.updateStatus('error', 'Error occurred');
+            this.updateButtons();
+            this.log('Error starting automation: ' + (error as Error).message);
+        }
     }
-  }
 
-  private formatPageType(pageType: string): string {
-    return pageType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  }
+    private async stopAutomation(): Promise<void> {
+        if (!this.currentTab) return;
 
-  private updateStatusIndicator(status: 'ready' | 'active' | 'error', text: string): void {
-    const statusDot = document.querySelector('.status-dot');
-    const statusText = document.querySelector('.status-text');
+        try {
+            this.isAutomationActive = false;
+            this.updateStatus('ready', 'Stopping...');
+            this.updateButtons();
 
-    if (statusDot) {
-      statusDot.className = `status-dot ${status}`;
+            await chrome.tabs.sendMessage(this.currentTab.id!, {
+                type: 'STOP_AUTOMATION',
+                payload: {},
+                timestamp: new Date().toISOString()
+            });
+
+            this.updateStatus('ready', 'Ready');
+            this.log('Automation stopped');
+        } catch (error) {
+            this.log('Error stopping automation: ' + (error as Error).message);
+            this.updateStatus('ready', 'Ready');
+        }
     }
 
-    if (statusText) {
-      statusText.textContent = text;
+    private updateUI(): void {
+        if (this.currentTab) {
+            const isCoursera = this.isCoursera();
+            
+            const pageTypeEl = document.getElementById('pageType');
+            const automatableEl = document.getElementById('automatable');
+            
+            if (pageTypeEl) {
+                pageTypeEl.textContent = isCoursera ? 'Coursera Page' : 'Other Website';
+            }
+            
+            if (automatableEl) {
+                automatableEl.textContent = isCoursera ? 'Yes' : 'No';
+            }
+        }
+
+        this.updateButtons();
     }
-  }
 
-  private updateActionButtons(): void {
-    const startButton = document.getElementById('startAutomation') as HTMLButtonElement;
-    const stopButton = document.getElementById('stopAutomation') as HTMLButtonElement;
-
-    if (startButton) {
-      startButton.disabled = this.isAutomationActive || !this.isCoursera();
+    private updateButtons(): void {
+        const startBtn = document.getElementById('startBtn') as HTMLButtonElement;
+        const stopBtn = document.getElementById('stopBtn') as HTMLButtonElement;
+        
+        if (startBtn) {
+            startBtn.disabled = this.isAutomationActive || !this.isCoursera();
+        }
+        
+        if (stopBtn) {
+            stopBtn.disabled = !this.isAutomationActive;
+        }
     }
 
-    if (stopButton) {
-      stopButton.disabled = !this.isAutomationActive;
+    private updateStatus(type: string, text: string): void {
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        
+        if (statusDot) {
+            statusDot.className = 'status-dot status-' + type;
+        }
+        
+        if (statusText) {
+            statusText.textContent = text;
+        }
     }
-  }
 
-  private async updateUI(): Promise<void> {
-    this.updateActionButtons();
-    await this.loadProgressData();
-    await this.loadStatistics();
-  }
-
-  private async loadProgressData(): Promise<void> {
-    const courseId = this.extractCourseId();
-    if (!courseId) return;
-
-    const progress = await this.storage.get(`course_progress_${courseId}`);
-    if (progress) {
-      this.updateProgressDisplay(progress);
+    private isCoursera(): boolean {
+        return this.currentTab?.url?.includes('coursera.org') || false;
     }
-  }
 
-  private async loadStatistics(): Promise<void> {
-    // Load and display statistics
-    const completedModulesElement = document.getElementById('completedModules');
-    const avgQuizScoreElement = document.getElementById('avgQuizScore');
-    const timeSavedElement = document.getElementById('timeSaved');
-
-    // This would be populated with real data from storage
-    if (completedModulesElement) completedModulesElement.textContent = '0';
-    if (avgQuizScoreElement) avgQuizScoreElement.textContent = '-';
-    if (timeSavedElement) timeSavedElement.textContent = '0h 0m';
-  }
-
-  private updateProgressDisplay(progress: any): void {
-    const progressFill = document.getElementById('progressFill') as HTMLElement;
-    const progressText = document.getElementById('progressText');
-
-    if (progressFill && progressText) {
-      const percentage = progress.totalProgress || 0;
-      progressFill.style.width = `${percentage}%`;
-      progressText.textContent = `${Math.round(percentage)}% Complete`;
+    private log(message: string): void {
+        console.log('[Popup] ' + message);
+        
+        const logContainer = document.getElementById('activityLog');
+        if (logContainer) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            logContainer.appendChild(entry);
+            
+            // Keep only last 5 entries for production
+            while (logContainer.children.length > 5) {
+                logContainer.removeChild(logContainer.firstChild!);
+            }
+            
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
     }
-  }
-
-  private isCoursera(): boolean {
-    return this.currentTab?.url?.includes('coursera.org') || false;
-  }
-
-  private extractCourseId(): string | null {
-    if (!this.currentTab?.url) return null;
-    const match = this.currentTab.url.match(/\/learn\/([^/]+)/);
-    return match?.[1] || null;
-  }
-
-  private setLoadingState(loading: boolean): void {
-    const container = document.querySelector('.popup-container');
-    if (container) {
-      if (loading) {
-        container.classList.add('loading');
-      } else {
-        container.classList.remove('loading');
-      }
-    }
-  }
-
-  private showSuccess(message: string): void {
-    this.showNotification(message, 'success');
-  }
-
-  private showError(message: string): void {
-    this.showNotification(message, 'error');
-  }
-
-  private showNotification(message: string, type: 'success' | 'error'): void {
-    // Simple notification system - could be enhanced
-    console.log(`[${type.toUpperCase()}] ${message}`);
-  }
-
-  private async openOptionsPage(): Promise<void> {
-    await chrome.runtime.openOptionsPage();
-  }
-
-  private async shareCurrentPage(): Promise<void> {
-    if (!this.currentTab?.url) return;
-    
-    try {
-      await navigator.clipboard.writeText(this.currentTab.url);
-      this.showSuccess('Link copied to clipboard');
-    } catch (error) {
-      this.showError('Failed to copy link');
-    }
-  }
-
-  private async viewAnalytics(): Promise<void> {
-    // Open analytics dashboard - could be implemented as a separate page
-    this.showSuccess('Analytics feature coming soon');
-  }
-
-  private generateId(): string {
-    return `popup_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
 }
 
-// Initialize popup when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  new PopupController();
-});
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new PopupController());
+} else {
+    new PopupController();
+}

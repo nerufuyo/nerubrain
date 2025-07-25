@@ -1,8 +1,8 @@
-# 🧠 Coursera Automation Extension
+# Coursera Automation Extension
 
 A comprehensive browser extension that intelligently automates Coursera learning activities while maintaining academic integrity and enhancing the learning experience.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Architecture](#architecture)
@@ -13,9 +13,9 @@ A comprehensive browser extension that intelligently automates Coursera learning
 - [Contributing](#contributing)
 - [License](#license)
 
-## ✨ Features
+## Features
 
-### 🎯 Core Automation Features
+### Core Automation Features
 - **Quiz Automation** - Intelligent quiz completion with answer validation
 - **Video Management** - Automated video playback with speed optimization
 - **Reading Materials** - Smart reading completion tracking
@@ -24,7 +24,7 @@ A comprehensive browser extension that intelligently automates Coursera learning
 - **Shareable Links** - Easy content sharing functionality
 - **Advanced Analytics** - Performance tracking and improvement suggestions
 
-### 🔧 Technical Features
+### Technical Features
 - **Manifest V3** - Modern browser extension architecture
 - **TypeScript** - Type-safe development with enhanced DX
 - **100% Test Coverage** - Comprehensive testing with Jest
@@ -32,7 +32,7 @@ A comprehensive browser extension that intelligently automates Coursera learning
 - **Error Handling** - Robust error reporting and recovery
 - **Privacy-First** - Local processing with minimal data collection
 
-## 🏗️ Architecture
+## Architecture
 
 ### Frontend (Browser Extension)
 ```
@@ -54,7 +54,7 @@ backend/
 └── tests/            # Backend tests
 ```
 
-## 📦 Installation
+## Installation
 
 ### From Chrome Web Store
 1. Visit the Chrome Web Store (link coming soon)
@@ -66,7 +66,7 @@ backend/
 2. Build the extension
 3. Load unpacked extension in Chrome
 
-## 🚀 Development Setup
+## Development Setup
 
 ### Prerequisites
 - Node.js 18+ and npm

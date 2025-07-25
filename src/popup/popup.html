@@ -8,130 +8,56 @@
 </head>
 <body>
     <div class="popup-container">
-        <header class="popup-header">
-            <h1>Coursera Automation</h1>
-            <div class="status-indicator" id="statusIndicator">
-                <span class="status-dot"></span>
-                <span class="status-text">Ready</span>
+        <div class="popup-header">
+            <h1 class="popup-title">Coursera Automation</h1>
+            <div class="status-indicator">
+                <div class="status-dot status-ready" id="statusDot"></div>
+                <span class="status-text" id="statusText">Ready</span>
             </div>
-        </header>
+        </div>
 
-        <main class="popup-content">
-            <!-- Page Detection Section -->
-            <section class="detection-section">
-                <h3>Current Page</h3>
-                <div class="page-info" id="pageInfo">
-                    <span class="page-type" id="pageType">Detecting...</span>
-                    <span class="automatable-badge" id="automatableBadge"></span>
-                </div>
-            </section>
-
-            <!-- Quick Actions Section -->
-            <section class="actions-section">
-                <h3>Quick Actions</h3>
-                <div class="action-buttons">
-                    <button id="startAutomation" class="btn btn-primary" disabled>
-                        <span class="btn-icon">▶️</span>
-                        Start Automation
-                    </button>
-                    <button id="stopAutomation" class="btn btn-secondary" disabled>
-                        <span class="btn-icon">⏹️</span>
-                        Stop Automation
-                    </button>
-                </div>
-            </section>
-
-            <!-- Automation Settings Section -->
-            <section class="settings-section">
-                <h3>Automation Features</h3>
-                <div class="feature-toggles">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="quizAutomation" checked>
-                        <span class="toggle-slider"></span>
-                        Quiz Automation
-                    </label>
-                    <label class="toggle-label">
-                        <input type="checkbox" id="videoAutomation" checked>
-                        <span class="toggle-slider"></span>
-                        Video Automation
-                    </label>
-                    <label class="toggle-label">
-                        <input type="checkbox" id="readingAutomation" checked>
-                        <span class="toggle-slider"></span>
-                        Reading Automation
-                    </label>
-                    <label class="toggle-label">
-                        <input type="checkbox" id="linkSharing" checked>
-                        <span class="toggle-slider"></span>
-                        Link Sharing
-                    </label>
-                </div>
-            </section>
-
-            <!-- Speed Settings Section -->
-            <section class="speed-section">
-                <h3>Speed Settings</h3>
-                <div class="speed-controls">
-                    <div class="speed-control">
-                        <label for="videoSpeed">Video Speed:</label>
-                        <select id="videoSpeed">
-                            <option value="1">1x (Normal)</option>
-                            <option value="1.25">1.25x</option>
-                            <option value="1.5" selected>1.5x (Recommended)</option>
-                            <option value="1.75">1.75x</option>
-                            <option value="2">2x</option>
-                        </select>
-                    </div>
-                    <div class="speed-control">
-                        <label for="quizDelay">Quiz Delay (ms):</label>
-                        <input type="number" id="quizDelay" value="1000" min="500" max="5000" step="500">
-                    </div>
-                </div>
-            </section>
-
-            <!-- Progress Section -->
-            <section class="progress-section">
-                <h3>Course Progress</h3>
-                <div class="progress-info" id="progressInfo">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-text">
-                        <span id="progressText">No course data available</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Statistics Section -->
-            <section class="stats-section">
-                <h3>Statistics</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">Completed Modules:</span>
-                        <span class="stat-value" id="completedModules">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Quiz Score Avg:</span>
-                        <span class="stat-value" id="avgQuizScore">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Time Saved:</span>
-                        <span class="stat-value" id="timeSaved">0h 0m</span>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="popup-footer">
-            <div class="footer-buttons">
-                <button id="openOptions" class="btn btn-text">⚙️ Settings</button>
-                <button id="shareLink" class="btn btn-text">🔗 Share</button>
-                <button id="viewAnalytics" class="btn btn-text">📊 Analytics</button>
+        <div class="section">
+            <div class="section-title">Page Detection</div>
+            <div class="info-grid">
+                <span class="info-label">Page Type:</span>
+                <span class="info-value" id="pageType">Detecting...</span>
+                <span class="info-label">Automatable:</span>
+                <span class="info-value" id="automatable">Unknown</span>
             </div>
-            <div class="footer-info">
-                <span class="version">v1.0.0</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Controls</div>
+            <div class="controls">
+                <button id="startBtn" class="btn btn-primary">Start Automation</button>
+                <button id="stopBtn" class="btn btn-secondary">Stop Automation</button>
             </div>
-        </footer>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Features</div>
+            <div class="feature-toggles">
+                <div class="toggle-item">
+                    <span class="toggle-label">Quiz Automation</span>
+                    <div class="toggle active" data-feature="quiz"></div>
+                </div>
+                <div class="toggle-item">
+                    <span class="toggle-label">Video Automation</span>
+                    <div class="toggle active" data-feature="video"></div>
+                </div>
+                <div class="toggle-item">
+                    <span class="toggle-label">Reading Automation</span>
+                    <div class="toggle active" data-feature="reading"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Activity Log</div>
+            <div class="activity-log" id="activityLog">
+                <div class="log-entry">Extension ready for use</div>
+            </div>
+        </div>
     </div>
 
     <script src="popup.js"></script>
